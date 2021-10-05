@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 public class Parse{
 	
@@ -22,22 +24,67 @@ public class Parse{
 	// list of tokens obtained from input program
 	public static List<String> tokens = new ArrayList<String>(); 
 	
+	// list of patterns 
+	public static List<Pattern> regex = new ArrayList<Pattern>(); 
+	
 	// iterator for tokens list 
 	//public static Iterator<String> iter = tokens.iterator();
 	public static int index = 0; 
 	
 
 	public static void main(String args[]) {
-		// read in input program from stdin 
+		regex.add(Pattern.compile("^(\\" + BRACE_L + ")"));
+		regex.add(Pattern.compile("^(\\" + BRACE_R + ")"));
+		regex.add(Pattern.compile("^(" + SOP + ")"));
+		regex.add(Pattern.compile("^(\\" + PAREN_L + ")"));
+		regex.add(Pattern.compile("^(\\" + PAREN_R + ")"));
+		regex.add(Pattern.compile("^(" + SEMIC + ")"));
+		regex.add(Pattern.compile("^(" + IF + ")"));
+		regex.add(Pattern.compile("^(" + ELSE + ")"));
+		regex.add(Pattern.compile("^(" + WHILE + ")"));
+		regex.add(Pattern.compile("^(" + TRUE + ")"));
+		regex.add(Pattern.compile("^(" + FALSE + ")"));
+		regex.add(Pattern.compile("^(" + NOT + ")"));
+		
 		Scanner sc = new Scanner(System.in); 
-			String t = "";
+		while(sc.hasNextLine()) {
+			findTokens(sc.nextLine().trim());
+		}
+	
+		// read in input program from stdin 
+		/*
+		Scanner sc = new Scanner(System.in); 
+			String t;
 		while(sc.hasNext()) {
 			t = sc.next();
 			tokens.add(t);
 		}
+		*/
 		System.out.println(tokens.size());
 		nextToken();
 		S();
+		if(index != tokens.size()) {
+			parseError();
+		}
+	}
+	
+	public static void findTokens(String line){
+		while(!line.equals("")) {
+			boolean foundMatch = false;
+			for(Pattern pat : regex) {
+				Matcher match = pat.matcher(line);
+				if(match.find()) {
+					foundMatch = true;
+					String token = match.group().trim();
+					line = match.replaceFirst("").trim();
+					tokens.add(token);
+					break;
+				}
+			}
+			if(!foundMatch){
+				parseError();
+			}
+		}
 	}
 	
 	public static void eat(String t) {
@@ -113,7 +160,7 @@ public class Parse{
 			S();
 			L();
 		} else if(token.equals(BRACE_R)) {
-			
+
 		} else {
 			System.out.println("Parse Error in L");
 			parseError(); 
