@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 
 public class Parse{
 	
-	// set of terminal symbols 
+	// set of terminal symbols given by the grammar
 	private static final String BRACE_L = "{";
 	private static final String BRACE_R = "}";
 	private static final String SOP = "System.out.println";
@@ -18,20 +18,19 @@ public class Parse{
 	private static final String FALSE = "false";
 	private static final String NOT = "!"; 
 	
-	// current token 
+	// keeps track of the current token of the input program
 	public static String token; 
 	
 	// list of tokens obtained from input program
 	public static List<String> tokens = new ArrayList<String>(); 
 	
-	// list of patterns 
+	// list of patterns used to match against the input program to create
+	// tokens
 	public static List<Pattern> regex = new ArrayList<Pattern>(); 
 	
-	// iterator for tokens list 
-	//public static Iterator<String> iter = tokens.iterator();
+	// keeps track of the index of the current token
 	public static int index = 0; 
 	
-
 	public static void main(String args[]) {
 		regex.add(Pattern.compile("^(\\" + BRACE_L + ")"));
 		regex.add(Pattern.compile("^(\\" + BRACE_R + ")"));
@@ -46,28 +45,27 @@ public class Parse{
 		regex.add(Pattern.compile("^(" + FALSE + ")"));
 		regex.add(Pattern.compile("^(" + NOT + ")"));
 		
+		// read in input program from stdin 
 		Scanner sc = new Scanner(System.in); 
 		while(sc.hasNextLine()) {
 			findTokens(sc.nextLine().trim());
 		}
-	
-		// read in input program from stdin 
-		/*
-		Scanner sc = new Scanner(System.in); 
-			String t;
-		while(sc.hasNext()) {
-			t = sc.next();
-			tokens.add(t);
-		}
-		*/
-		System.out.println(tokens.size());
+		
 		nextToken();
+		
+		// begin at the start terminal 
 		S();
+		
+		// if the parsing is complete but there are remaining tokens 
+		// call parseError()
 		if(index != tokens.size()) {
 			parseError();
 		}
+
 	}
 	
+	// using the terminal symbols from the grammar to tokenize the input 
+	// program
 	public static void findTokens(String line){
 		while(!line.equals("")) {
 			boolean foundMatch = false;
@@ -87,19 +85,21 @@ public class Parse{
 		}
 	}
 	
+	// compares current token with the grammar's expected token 
 	public static void eat(String t) {
 		if(token.equals(t)) {
 			nextToken();
 		} else {
-			System.out.println("Parse Error in eat()");
+			//System.out.println("Parse Error in eat()");
 			parseError(); 
 		}
 	}
 	
+	// updates "token" to the next token in the input 
 	public static void nextToken(){
 		if(index < tokens.size()) {
 			token = tokens.get(index);
-			System.out.println(token);
+			//System.out.println(token);
 			index++;
 		} else {
 			System.out.println("Program parsed successfully"); 
@@ -107,6 +107,7 @@ public class Parse{
 		}
 	}
 	
+	// prints "parse error" to stdout and exits program 
 	public static void parseError() {
 		System.out.println("Parse error");
 		System.exit(0); 
@@ -140,7 +141,7 @@ public class Parse{
 			eat(PAREN_R);
 			S();
 		} else {
-			System.out.println("Parse Error in S");
+			//System.out.println("Parse Error in S");
 			parseError(); 
 		}	
 	}
@@ -160,9 +161,9 @@ public class Parse{
 			S();
 			L();
 		} else if(token.equals(BRACE_R)) {
-
+			// do nothing : M[L,BRACE_R] = emptystring
 		} else {
-			System.out.println("Parse Error in L");
+			//System.out.println("Parse Error in L");
 			parseError(); 
 		}
 	}
@@ -177,7 +178,7 @@ public class Parse{
 			eat(NOT);
 			E();
 		} else {
-			System.out.println("Parse Error in E");
+			//System.out.println("Parse Error in E");
 			parseError();
 		}
 	}	
