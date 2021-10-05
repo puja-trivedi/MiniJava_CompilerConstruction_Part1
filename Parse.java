@@ -3,7 +3,6 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 public class Parse{
-	
 	// set of terminal symbols given by the grammar
 	private static final String BRACE_L = "{";
 	private static final String BRACE_R = "}";
@@ -22,16 +21,14 @@ public class Parse{
 	public static String token; 
 	
 	// list of tokens obtained from input program
-	public static List<String> tokens = new ArrayList<String>(); 
+	public static LinkedList<String> tokens = new LinkedList<String>(); 
 	
-	// list of patterns used to match against the input program to create
-	// tokens
+	// list of patterns used to match against the input program to 
+	// create tokens
 	public static List<Pattern> regex = new ArrayList<Pattern>(); 
 	
-	// keeps track of the index of the current token
-	public static int index = 0; 
-	
 	public static void main(String args[]) {
+		// add regular expression patterns based off the grammar to regex
 		regex.add(Pattern.compile("^(\\" + BRACE_L + ")"));
 		regex.add(Pattern.compile("^(\\" + BRACE_R + ")"));
 		regex.add(Pattern.compile("^(" + SOP + ")"));
@@ -51,17 +48,19 @@ public class Parse{
 			findTokens(sc.nextLine().trim());
 		}
 		
+		// initialize "token" variable with first token from input
 		nextToken();
 		
-		// begin at the start terminal 
+		// begin at the start symbol
 		S();
 		
 		// if the parsing is complete but there are remaining tokens 
 		// call parseError()
-		if(index != tokens.size()) {
+		if(tokens.size() == 0) {
+			System.out.println("Program parsed successfully"); 
+		} else {
 			parseError();
 		}
-
 	}
 	
 	// using the terminal symbols from the grammar to tokenize the input 
@@ -90,20 +89,16 @@ public class Parse{
 		if(token.equals(t)) {
 			nextToken();
 		} else {
-			//System.out.println("Parse Error in eat()");
 			parseError(); 
 		}
 	}
 	
 	// updates "token" to the next token in the input 
 	public static void nextToken(){
-		if(index < tokens.size()) {
-			token = tokens.get(index);
-			//System.out.println(token);
-			index++;
+		if(tokens.size() > 0) {
+			token = tokens.remove();
 		} else {
-			System.out.println("Program parsed successfully"); 
-			System.exit(0);
+			token = "";
 		}
 	}
 	
@@ -114,7 +109,6 @@ public class Parse{
 	}
 	
 	// nonterminal symbol "S"
-	// S is the start symbol
 	public static void S(){
 		if(token.equals(BRACE_L)) {
 			eat(BRACE_L); 
